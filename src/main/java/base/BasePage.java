@@ -7,6 +7,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,6 +23,7 @@ public class BasePage {
 
     private final Properties prop;
     public String url;
+    public static String screenshotDestinationPath;
 
     public BasePage() throws IOException {
         prop = new Properties();
@@ -48,14 +50,48 @@ public class BasePage {
         return url;
     }
 
-    public void takeSnapshot(String name) throws IOException {
+    public static String takeSnapshot(String name) throws IOException {
         File srcFile = ((TakesScreenshot) getDriver()).getScreenshotAs(OutputType.FILE);
-        File destFile = new File(System.getProperty("user.dir") + "\\target\\screenshots\\" + name + timestamp() + ".png");
-        FileUtils.copyFile(srcFile, destFile);
+        String destFile = System.getProperty("user.dir") + "\\target\\screenshots\\" + name + timestamp() + ".png";
+        screenshotDestinationPath = destFile;
+
+        try {
+            FileUtils.copyFile(srcFile, new File(destFile));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return name;
     }
 
-    public String timestamp() {
-        return new SimpleDateFormat("yyyy-MM-dd HH-mm-ss").format(new Date());
+    public static String timestamp() {
+        return new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
+    }
+
+    public static String getScreenshotDestinationPath() {
+        return screenshotDestinationPath;
+    }
+
+    public static void checkResult(String actualResult, String expectedResult, String message){
+        try {
+            Assert.assertEquals(actualResult, expectedResult);
+            ExtentManager.pass(message);
+
+        } catch (AssertionError e) {
+            ExtentManager.fail(message + " - FAIL");
+            Assert.fail(message + " - FAIL");
+        }
+    }
+
+    public static void checkResult(Boolean actualResult, String message){
+        try {
+            Assert.assertTrue(actualResult);
+            ExtentManager.pass(message);
+
+        } catch (AssertionError e) {
+            ExtentManager.fail(message + " - FAIL");
+            Assert.fail(message + " - FAIL");
+        }
     }
 
 }

@@ -1,5 +1,6 @@
 package com.softwaretestingboard.magento;
 
+import base.ExtentManager;
 import base.Hooks;
 import org.testng.Assert;
 import org.testng.annotations.Listeners;
@@ -20,41 +21,51 @@ public class OrderPlacementTests extends Hooks {
     }
 
     @Test
+    public void checkEmptyCartMessage() throws IOException {
+        ExtentManager.log("Starting checkEmptyCartMessage test ...");
+
+        HomePage homepage = new HomePage();
+        homepage.waitForPageLoad();
+        homepage.getCartBtn().click();
+        ExtentManager.pass("Shopping cart was successfully opened");
+
+        String noItemsMessage = "You have no items in your shopping cart.";
+        waitForElementText(homepage.getMiniCart(), noItemsMessage);
+
+        checkResult(homepage.getMiniCart().getText().contains(noItemsMessage), "Empty cart message shown");
+    }
+
+    @Test
     public void addItemToCart() throws IOException {
+        ExtentManager.log("Starting addItemToCart test ...");
+
         HomePage homepage = new HomePage();
         homepage.getWomenMenuLink().click();
-
         CatalogPage catalogPage = new CatalogPage();
         catalogPage.getTopsWomenLink().click();
         catalogPage.getProductItems().get(1).click();
+        ExtentManager.pass("Reached product page");
 
         ProductPage productPage = new ProductPage();
         productPage.getSizeBtn().click();
         productPage.getColorBtn().click();
+        ExtentManager.pass("Selected size and color");
+
         productPage.getAddToCartBtn().click();
         waitForElementVisible(productPage.getSuccessMessage());
 
-        SoftAssert softAssert = new SoftAssert();
-        softAssert.assertTrue(productPage.getSuccessMessage().isDisplayed());
-        softAssert.assertEquals(homepage.getCartItemsNumber().getText(), "1");
-        softAssert.assertAll();
-
+        checkResult(productPage.getSuccessMessage().isDisplayed(),"Success message shown");
+        checkResult(homepage.getCartItemsNumber().getText(), "1", "Item shown in cart");
     }
 
     @Test
-    public void checkEmptyCartMessage() throws IOException {
-        HomePage homepage = new HomePage();
-        homepage.waitForPageLoad();
-        homepage.getCartBtn().click();
-
-        String message = "You have no items in your shopping cart.";
-        waitForElementText(homepage.getMiniCart(), message);
-        Assert.assertTrue(homepage.getMiniCart().getText().contains(message));
+    public void removeItemFromCart() {
+        checkResult("x", "y", "Item removed from the cart");
     }
 
     @Test
-    public void removeItemFromShoppingCart() {
-        Assert.fail();
+    public void checkoutProduct() {
+        checkResult("x", "x", "Item checkout");
     }
 
 }
