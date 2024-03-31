@@ -21,7 +21,7 @@ public class ExtentManager extends BasePage{
 
     public static ExtentReports getReport() {
         if(extentReport == null) {
-            setupExtentReport("luma-automation");
+            setupExtentReport("luma-automation_test_report");
         }
         return extentReport;
     }

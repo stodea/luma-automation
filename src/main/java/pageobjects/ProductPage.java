@@ -11,6 +11,8 @@ public class ProductPage extends BasePage {
 
     public WebDriver driver;
 
+    public String optionCssLocator = "[option-label='%s']";
+
     By addToCartBtn = By.cssSelector("button#product-addtocart-button");
     By sizeBtn = By.cssSelector("[attribute-code='size'] [index='0']");
     By colorBtn = By.cssSelector("[attribute-code='color'] [index='0']");
@@ -51,6 +53,11 @@ public class ProductPage extends BasePage {
     public WebElement getSuccessMessage() {
         this.driver = getDriver();
         return driver.findElement(successMessage);
+    }
+
+    public WebElement getOption(String optionToSelect) {
+        this.driver = getDriver();
+        return driver.findElement(By.cssSelector(String.format(optionCssLocator, optionToSelect)));
     }
 
 }

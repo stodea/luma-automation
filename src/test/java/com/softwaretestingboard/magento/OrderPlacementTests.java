@@ -6,6 +6,7 @@ import org.openqa.selenium.support.ui.Select;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 import pageobjects.*;
+import resources.ExcelDataProviders;
 
 import java.io.IOException;
 
@@ -45,7 +46,7 @@ public class OrderPlacementTests extends Hooks {
 
         productPage.getAddToCartBtn().click();
         waitForElementVisible(productPage.getSuccessMessage());
-        checkResult(productPage.getSuccessMessage().isDisplayed(),"Success message shown");
+        checkResult(productPage.getSuccessMessage().isDisplayed(), "Success message shown");
         checkResult(homepage.getCartItemsNumber().getText(), "1", "Item shown in cart");
     }
 
@@ -67,11 +68,30 @@ public class OrderPlacementTests extends Hooks {
         checkResult(homepage.getMiniCart().getText().contains(noItemsMessage), "Item removed from cart");
     }
 
-    @Test
-    public void checkoutProduct() throws IOException {
-        addItemToCart();
-
+    @Test(dataProvider = "dataForOrderProduct", dataProviderClass = ExcelDataProviders.class)
+    public void orderProduct(String menu, String category, String productName, String size, String color,
+                             String quantity, String email, String firstname, String lastname, String address,
+                             String city, String country, String state, String zip, String phone,
+                             String totalPrice) throws IOException {
+        ExtentManager.log("Starting order test for product: " + productName + " ...");
         HomePage homepage = new HomePage();
+        homepage.getLink(menu).click();
+        homepage.getLink(category).click();
+        CatalogPage catalogPage = new CatalogPage();
+        catalogPage.getLink(productName).click();
+        ExtentManager.pass("Reached " + productName + " product page");
+
+        ProductPage productPage = new ProductPage();
+        productPage.getOption(size).click();
+        productPage.getOption(color).click();
+        ExtentManager.pass("Selected " + size + " size and " + color + " color");
+
+        productPage.getQuantityInput().clear();
+        productPage.getQuantityInput().sendKeys(quantity);
+        ExtentManager.pass("Quantity set to " + quantity);
+
+        productPage.getAddToCartBtn().click();
+        waitForElementVisible(productPage.getSuccessMessage());
         homepage.getCartBtn().click();
         homepage.getMiniCartViewCartLink().click();
         CheckoutPage checkoutPage = new CheckoutPage();
@@ -84,18 +104,19 @@ public class OrderPlacementTests extends Hooks {
         waitForElementVisible(checkoutPage.getNextBtn());
         ExtentManager.pass("Checkout shipping page was reached");
 
-        checkoutPage.getEmailField().sendKeys("test@test.com");
-        checkoutPage.getFirstNameField().sendKeys("firstname");
-        checkoutPage.getLastNameField().sendKeys("lastname");
-        checkoutPage.getStreetAddressField().sendKeys("address");
-        checkoutPage.getCityField().sendKeys("city");
-        Select country = new Select(checkoutPage.getCountryDropdown());
-        country.selectByVisibleText("Romania");
+        checkoutPage.getEmailField().sendKeys(email);
+        checkoutPage.getFirstNameField().sendKeys(firstname);
+        checkoutPage.getLastNameField().sendKeys(lastname);
+        checkoutPage.getStreetAddressField().sendKeys(address);
+        checkoutPage.getCityField().sendKeys(city);
+        Select countrySelect = new Select(checkoutPage.getCountryDropdown());
+        countrySelect.selectByVisibleText(country);
         checkoutPage.waitForPageLoad();
-        Select state = new Select(checkoutPage.getStateDropdown());
-        state.selectByVisibleText("Alba");
-        checkoutPage.getZipField().sendKeys("5555");
-        checkoutPage.getPhoneField().sendKeys("555");
+        Select stateSelect = new Select(checkoutPage.getStateDropdown());
+        stateSelect.selectByVisibleText(state);
+        checkoutPage.waitForPageLoad();
+        checkoutPage.getZipField().sendKeys(zip);
+        checkoutPage.getPhoneField().sendKeys(phone);
         checkoutPage.waitForPageLoad();
         waitForElementToBeClickable(checkoutPage.getNextBtn());
         clickElement(checkoutPage.getNextBtn());
@@ -103,11 +124,20 @@ public class OrderPlacementTests extends Hooks {
         waitForElementToBeClickable(checkoutPage.getPlaceOrderBtn());
         ExtentManager.pass("Checkout payment page was reached");
 
+        waitForElementText(checkoutPage.getOrderTotal(), totalPrice);
+        waitForElementText(checkoutPage.getItemsInCart(), quantity);
+        String actualPrice = checkoutPage.getTotalPrice().getText();
+        checkResult(actualPrice, totalPrice, "Total price is: " + actualPrice + " expected: " + totalPrice);
+        String actualItemsNoInCart = checkoutPage.getItemsInCart().getText();
+        checkResult(actualItemsNoInCart, quantity, "Itesm number in cart: " + actualItemsNoInCart +
+                " expected: " + quantity);
+
         checkoutPage.getPlaceOrderBtn().click();
         checkoutPage.waitForPageLoad();
         String purchaseMessage = "Thank you for your purchase!";
         waitForElementText(checkoutPage.getPurchaseMessage(), purchaseMessage);
         checkResult(checkoutPage.getPurchaseMessage().getText(), purchaseMessage, "Order placed for item");
+        ExtentManager.log("Order test for product: " + productName + " finished.");
     }
 
 }

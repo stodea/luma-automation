@@ -18,9 +18,9 @@ import static resources.Constants.DEFAULT_WAIT_TIME;
 
 public class BasePage {
 
+    public static String screenshotDestinationPath;
     private final Properties prop;
     public String url;
-    public static String screenshotDestinationPath;
 
     public BasePage() throws IOException {
         prop = new Properties();
@@ -47,18 +47,9 @@ public class BasePage {
         wait.until(ExpectedConditions.elementToBeClickable(element));
     }
 
-    public void clickElement(WebElement element) {
-        ((JavascriptExecutor) getDriver()).executeScript("return arguments[0].click()", element);
-    }
-
     public static void waitForElementText(WebElement element, String text) {
         WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(DEFAULT_WAIT_TIME));
         wait.until(ExpectedConditions.textToBePresentInElement(element, text));
-    }
-
-    public String getUrl() {
-        url = prop.getProperty("url");
-        return url;
     }
 
     public static String takeSnapshot(String name) throws IOException {
@@ -83,7 +74,7 @@ public class BasePage {
         return screenshotDestinationPath;
     }
 
-    public static void checkResult(String actualResult, String expectedResult, String message){
+    public static void checkResult(String actualResult, String expectedResult, String message) {
         try {
             Assert.assertEquals(actualResult, expectedResult);
             ExtentManager.pass(message);
@@ -94,7 +85,7 @@ public class BasePage {
         }
     }
 
-    public static void checkResult(Boolean actualResult, String message){
+    public static void checkResult(Boolean actualResult, String message) {
         try {
             Assert.assertTrue(actualResult);
             ExtentManager.pass(message);
@@ -103,6 +94,19 @@ public class BasePage {
             ExtentManager.fail(message + " - FAIL");
             Assert.fail(message + " - FAIL");
         }
+    }
+
+    public void clickElement(WebElement element) {
+        ((JavascriptExecutor) getDriver()).executeScript("return arguments[0].click()", element);
+    }
+
+    public WebElement getLink(String linkText) {
+        return getDriver().findElement(By.linkText(linkText));
+    }
+
+    public String getUrl() {
+        url = prop.getProperty("url");
+        return url;
     }
 
 }

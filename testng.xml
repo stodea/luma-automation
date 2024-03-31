@@ -28,11 +28,11 @@
             </class>
         </classes>
     </test>
-    <test name="checkoutProduct">
+    <test name="orderProduct">
         <classes>
             <class name="com.softwaretestingboard.magento.OrderPlacementTests">
                 <methods>
-                    <include name="checkoutProduct"/>
+                    <include name="orderProduct"/>
                 </methods>
             </class>
         </classes>

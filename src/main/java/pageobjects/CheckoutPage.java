@@ -28,6 +28,8 @@ public class CheckoutPage extends BasePage {
     By purchaseMessage = By.cssSelector("[data-ui-id='page-title-wrapper']");
     By loadingIcon = By.cssSelector(".loader");
     By shippingPrice = By.cssSelector("[data-bind*='price_excl_tax']");
+    By totalPrice = By.cssSelector(".grand.totals > .amount  .price");
+    By itemsInCart = By.cssSelector("[data-bind*='getCartSummaryItemsCount']");
 
 
     public CheckoutPage() throws IOException {
@@ -112,6 +114,16 @@ public class CheckoutPage extends BasePage {
     public List<WebElement> getShippingPrices() {
         this.driver = getDriver();
         return driver.findElements(shippingPrice);
+    }
+
+    public WebElement getTotalPrice() {
+        this.driver = getDriver();
+        return driver.findElement(totalPrice);
+    }
+
+    public WebElement getItemsInCart() {
+        this.driver = getDriver();
+        return driver.findElement(itemsInCart);
     }
 
     public void waitForPageLoad() {
