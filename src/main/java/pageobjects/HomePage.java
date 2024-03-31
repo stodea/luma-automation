@@ -18,6 +18,7 @@ public class HomePage extends BasePage {
     By cartItemsNumber = By.cssSelector(".counter-number");
     By miniCart = By.cssSelector("div#minicart-content-wrapper");
     By miniCartViewCartLink = By.cssSelector("div#minicart-content-wrapper .action.viewcart");
+    By removeItemButton = By.cssSelector("a[title='Remove item']");
     By greetBanner = By.cssSelector(".header.panel > .header.links > .greet.welcome > .not-logged-in");
 
 
@@ -58,6 +59,11 @@ public class HomePage extends BasePage {
     public WebElement getMiniCart() {
         this.driver = getDriver();
         return driver.findElement(miniCart);
+    }
+
+    public WebElement getRemoveItemButton() {
+        this.driver = getDriver();
+        return driver.findElement(removeItemButton);
     }
 
     public void waitForPageLoad() {
